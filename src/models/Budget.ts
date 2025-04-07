@@ -1,6 +1,21 @@
-const mongoose = require("mongoose");
+import mongoose, { Document, Model } from 'mongoose';
+import { IBudget } from '../types';
 
-const BudgetSchema = new mongoose.Schema(
+export type BudgetCategory = 'Food' | 'Transport' | 'Entertainment' | 'Bills' | 'Shopping' | 'Other';
+
+export interface IBudgetDocument extends Omit<IBudget, '_id'>, Document {
+  user: mongoose.Types.ObjectId;
+  category: BudgetCategory;
+  limit: number;
+  startDate: Date;
+  endDate: Date;
+}
+
+interface IBudgetModel extends Model<IBudgetDocument> {
+  // Add any static methods here if needed
+}
+
+const BudgetSchema = new mongoose.Schema<IBudgetDocument, IBudgetModel>(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -21,7 +36,7 @@ const BudgetSchema = new mongoose.Schema(
       type: Date,
       required: [true, "Start date is required"],
       validate: {
-        validator: function (value) {
+        validator: function (value: Date) {
           return value < this.endDate; // Start date must be before end date
         },
         message: "Start date must be before end date",
@@ -35,4 +50,4 @@ const BudgetSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Budget", BudgetSchema);
+export const Budget = mongoose.model<IBudgetDocument, IBudgetModel>("Budget", BudgetSchema); 

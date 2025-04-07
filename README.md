@@ -53,7 +53,7 @@ The **Expense Tracker and Budget Management System Backend** is a Node.js-based 
    JWT_SECRET=your_jwt_secret_key
    EMAIL_USER=your_email@gmail.com
    EMAIL_PASS=your_email_app_password
-   CLIENT_URL=http://localhost:3000
+   CLIENT_URL=http://localhost:5000/api
    ```
    > **Note**: If using Gmail, enable "Less Secure Apps" or use an App Password.
 

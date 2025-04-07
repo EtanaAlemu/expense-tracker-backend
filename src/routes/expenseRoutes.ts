@@ -1,14 +1,14 @@
-const express = require("express");
-const {
+import express from 'express';
+import {
   addExpense,
   getExpenses,
   updateExpense,
   deleteExpense,
   getAllExpenses, // Admin: Get all expenses
   deleteAnyExpense, // Admin: Delete any expense
-} = require("../controllers/expenseController");
+} from '../controllers/expenseController';
 
-const { protect, adminProtect } = require("../middleware/authMiddleware");
+import { protect, adminProtect } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
@@ -22,4 +22,4 @@ router.delete("/:id", protect, deleteExpense);
 router.get("/admin/all", protect, adminProtect, getAllExpenses); // Get all expenses
 router.delete("/admin/:id", protect, adminProtect, deleteAnyExpense); // Delete any user's expense
 
-module.exports = router;
+export default router; 

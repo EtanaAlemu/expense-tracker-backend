@@ -1,14 +1,14 @@
-const express = require("express");
-const {
+import express from 'express';
+import {
     addBudget,
     getBudgets,
     updateBudget,
     deleteBudget,
     getAllBudgets,  // Admin: Get all budgets
     deleteAnyBudget, // Admin: Delete any budget
-  } = require("../controllers/budgetController");
+} from '../controllers/budgetController';
   
-const { protect, adminProtect } = require("../middleware/authMiddleware");
+import { protect, adminProtect } from '../middleware/authMiddleware';
   
 const router = express.Router();
 
@@ -22,4 +22,4 @@ router.delete("/:id", protect, deleteBudget);
 router.get("/admin/all", protect, adminProtect, getAllBudgets); // Get all budgets
 router.delete("/admin/:id", protect, adminProtect, deleteAnyBudget); // Delete any user's budget
 
-module.exports = router;
+export default router; 

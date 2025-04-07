@@ -1,13 +1,13 @@
-const express = require("express");
-const { protect, adminProtect } = require("../middleware/authMiddleware");
-const {
+import express from 'express';
+import { protect, adminProtect } from '../middleware/authMiddleware';
+import {
   addTransaction,
   getTransactions,
   updateTransaction,
   deleteTransaction,
   getAllTransactions,
   deleteAnyTransaction,
-} = require("../controllers/transactionController");
+} from '../controllers/transactionController';
 
 const router = express.Router();
 
@@ -21,4 +21,4 @@ router.delete("/:id", protect, deleteTransaction); // Delete a transaction by th
 router.get("/admin", protect, adminProtect, getAllTransactions); // Admin: Get all transactions
 router.delete("/admin/:id", protect, adminProtect, deleteAnyTransaction); // Admin: Delete any transaction
 
-module.exports = router;
+export default router; 

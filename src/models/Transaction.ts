@@ -1,6 +1,16 @@
-const mongoose = require("mongoose");
+import mongoose, { Document, Model } from 'mongoose';
+import { ITransaction } from '../types';
 
-const TransactionSchema = new mongoose.Schema(
+export interface ITransactionDocument extends Omit<ITransaction, '_id'>, Document {
+  user: mongoose.Types.ObjectId;
+  type: 'Income' | 'Expense';
+}
+
+interface ITransactionModel extends Model<ITransactionDocument> {
+  // Add any static methods here if needed
+}
+
+const TransactionSchema = new mongoose.Schema<ITransactionDocument, ITransactionModel>(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -32,4 +42,4 @@ const TransactionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Transaction", TransactionSchema);
+export const Transaction = mongoose.model<ITransactionDocument, ITransactionModel>("Transaction", TransactionSchema); 

@@ -1,5 +1,5 @@
-const express = require("express");
-const { 
+import express from 'express';
+import { 
   getUserProfile, 
   updateUserProfile, 
   getAllUsers, 
@@ -7,8 +7,8 @@ const {
   updateUserRole, 
   deactivateUser, 
   activateUser  
-} = require("../controllers/userController");
-const { protect, adminProtect } = require("../middleware/authMiddleware");
+} from '../controllers/userController';
+import { protect, adminProtect } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
@@ -29,4 +29,4 @@ router.put("/:id/deactivate", protect, adminProtect, deactivateUser);
 // Admin: Activate user
 router.put("/:id/activate", protect, adminProtect, activateUser);
 
-module.exports = router;
+export default router; 

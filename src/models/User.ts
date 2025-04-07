@@ -1,7 +1,21 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+import mongoose, { Document, Model } from 'mongoose';
+import bcrypt from 'bcryptjs';
+import { IUser } from '../types';
 
-const UserSchema = new mongoose.Schema(
+export interface IUserDocument extends Omit<IUser, '_id'>, Document {
+  role: 'user' | 'admin';
+  currency: string;
+  isActive: boolean;
+  resetPasswordToken: string | null;
+  resetPasswordExpires: Date | null;
+  comparePassword(candidatePassword: string): Promise<boolean>;
+}
+
+interface IUserModel extends Model<IUserDocument> {
+  // Add any static methods here if needed
+}
+
+const UserSchema = new mongoose.Schema<IUserDocument, IUserModel>(
   {
     firstName: {
       type: String,
@@ -50,7 +64,6 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
 // Hash password before saving user
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
@@ -62,12 +75,16 @@ UserSchema.pre("save", async function (next) {
 // Hash password before updating user password
 UserSchema.pre("findOneAndUpdate", async function (next) {
   const update = this.getUpdate();
-  if (update.password) {
+  if (update && 'password' in update && update.password) {
     const salt = await bcrypt.genSalt(10);
     update.password = await bcrypt.hash(update.password, salt);
   }
   next();
 });
 
+// Add method to compare passwords
+UserSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
-module.exports = mongoose.model("User", UserSchema);
+export const User = mongoose.model<IUserDocument, IUserModel>("User", UserSchema); 
