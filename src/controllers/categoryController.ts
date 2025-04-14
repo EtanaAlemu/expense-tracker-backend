@@ -36,6 +36,22 @@ export const getCategories = async (_req: Request, res: Response): Promise<void>
   }
 };
 
+// Get Category by ID
+export const getCategory = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+  try {
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+      res.status(404).json({ message: "Category not found" });
+      return;
+    }
+
+    res.status(200).json(category);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+};
+
 // Update Category
 export const updateCategory = async (req: Request<{ id: string }, {}, UpdateCategoryRequest>, res: Response): Promise<void> => {
   try {

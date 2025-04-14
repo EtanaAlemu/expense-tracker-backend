@@ -1,5 +1,5 @@
 import express from 'express';
-import { addCategory, getCategories, updateCategory, deleteCategory } from '../controllers/categoryController';
+import { addCategory, getCategories, getCategory, updateCategory, deleteCategory } from '../controllers/categoryController';
 
 import { protect, adminProtect } from '../middleware/authMiddleware';
 
@@ -66,6 +66,31 @@ router.post('/', protect, adminProtect, addCategory);
  *         description: Server error
  */
 router.get('/', protect, getCategories);
+
+/**
+ * @swagger
+ * /api/categories/{id}:
+ *   get:
+ *     summary: Get a specific category by ID
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Category ID
+ *     responses:
+ *       200:
+ *         description: Category details
+ *       404:
+ *         description: Category not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:id', protect, getCategory);
 
 /**
  * @swagger
