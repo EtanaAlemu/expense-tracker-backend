@@ -4,6 +4,7 @@ import { ITransaction } from '../types';
 export interface ITransactionDocument extends Omit<ITransaction, '_id'>, Document {
   user: mongoose.Types.ObjectId;
   type: 'Income' | 'Expense';
+  category: mongoose.Types.ObjectId;
 }
 
 interface ITransactionModel extends Model<ITransactionDocument> {
@@ -27,7 +28,8 @@ const TransactionSchema = new mongoose.Schema<ITransactionDocument, ITransaction
       required: [true, "Transaction amount is required"],
     },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
       required: [true, "Transaction category is required"],
     },
     description: {

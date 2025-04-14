@@ -146,13 +146,95 @@ router.delete("/:id", protect, deleteTransaction); // Delete a transaction by th
  * @swagger
  * /api/transactions/admin:
  *   get:
- *     summary: Get all transactions from all users (Admin only)
- *     tags: [Admin, Transactions]
+ *     summary: Get all transactions (Admin only)
+ *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         description: Page number (0-based)
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *       - name: size
+ *         in: query
+ *         description: Number of items per page
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - name: query
+ *         in: query
+ *         description: Search text for transaction description
+ *         schema:
+ *           type: string
+ *       - name: id
+ *         in: query
+ *         description: Filter by specific transaction ID
+ *         schema:
+ *           type: string
+ *       - name: minAmount
+ *         in: query
+ *         description: Minimum transaction amount
+ *         schema:
+ *           type: number
+ *       - name: maxAmount
+ *         in: query
+ *         description: Maximum transaction amount
+ *         schema:
+ *           type: number
+ *       - name: startDate
+ *         in: query
+ *         description: Start date for transaction date range (YYYY-MM-DD)
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - name: endDate
+ *         in: query
+ *         description: End date for transaction date range (YYYY-MM-DD)
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - name: category
+ *         in: query
+ *         description: Filter by category ID
+ *         schema:
+ *           type: string
+ *       - name: type
+ *         in: query
+ *         description: Filter by transaction type
+ *         schema:
+ *           type: string
+ *           enum: [income, expense]
  *     responses:
  *       200:
- *         description: List of all transactions
+ *         description: Paginated list of transactions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 content:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Transaction'
+ *                 page:
+ *                   type: object
+ *                   properties:
+ *                     size:
+ *                       type: integer
+ *                       description: Number of items per page
+ *                     number:
+ *                       type: integer
+ *                       description: Current page number (0-based)
+ *                     totalElements:
+ *                       type: integer
+ *                       description: Total number of items
+ *                     totalPages:
+ *                       type: integer
+ *                       description: Total number of pages
+ *       400:
+ *         description: Invalid transaction ID or category ID format
  *       401:
  *         description: Not authorized, no token
  *       403:

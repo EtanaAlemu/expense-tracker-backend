@@ -149,15 +149,91 @@ router.delete("/:id", protect, deleteBudget);
 
 /**
  * @swagger
- * /api/budgets/admin/all:
+ * /api/budgets/admin:
  *   get:
- *     summary: Get all budgets for all users (Admin only)
- *     tags: [Admin, Budgets]
+ *     summary: Get all budgets (Admin only)
+ *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         description: Page number (0-based)
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *       - name: size
+ *         in: query
+ *         description: Number of items per page
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - name: query
+ *         in: query
+ *         description: Search text for budget description
+ *         schema:
+ *           type: string
+ *       - name: id
+ *         in: query
+ *         description: Filter by specific budget ID
+ *         schema:
+ *           type: string
+ *       - name: minAmount
+ *         in: query
+ *         description: Minimum budget amount
+ *         schema:
+ *           type: number
+ *       - name: maxAmount
+ *         in: query
+ *         description: Maximum budget amount
+ *         schema:
+ *           type: number
+ *       - name: startDate
+ *         in: query
+ *         description: Start date for budget date range (YYYY-MM-DD)
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - name: endDate
+ *         in: query
+ *         description: End date for budget date range (YYYY-MM-DD)
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - name: category
+ *         in: query
+ *         description: Filter by category ID
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
- *         description: List of all budgets
+ *         description: Paginated list of budgets
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 content:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Budget'
+ *                 page:
+ *                   type: object
+ *                   properties:
+ *                     size:
+ *                       type: integer
+ *                       description: Number of items per page
+ *                     number:
+ *                       type: integer
+ *                       description: Current page number (0-based)
+ *                     totalElements:
+ *                       type: integer
+ *                       description: Total number of items
+ *                     totalPages:
+ *                       type: integer
+ *                       description: Total number of pages
+ *       400:
+ *         description: Invalid budget ID or category ID format
  *       401:
  *         description: Not authorized, no token
  *       403:
@@ -165,7 +241,7 @@ router.delete("/:id", protect, deleteBudget);
  *       500:
  *         description: Server error
  */
-router.get("/admin/all", protect, adminProtect, getAllBudgets); // Get all budgets
+router.get("/admin", protect, adminProtect, getAllBudgets);
 
 /**
  * @swagger

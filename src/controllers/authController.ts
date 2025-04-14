@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
@@ -5,6 +6,9 @@ import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import { User, IUserDocument } from '../models/User';
 import { CreateUserRequest, LoginRequest } from '../dto/user.dto';
+
+// Load environment variables
+dotenv.config();
 
 // Generate JWT Token
 const generateToken = (user: IUserDocument): string => {
@@ -109,13 +113,51 @@ export const forgotPassword = async (req: Request<{}, {}, { email: string }>, re
     user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour expiry
     await user.save();
 
-    // Send email with reset link
-    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+    const webLink = `${process.env.CLIENT_URL}?token=${resetToken}`;
+
+    // HTML email template with device detection
+    const htmlEmail = `
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #4a6ee0; color: white; padding: 10px 20px; text-align: center; }
+          .content { padding: 20px; border: 1px solid #ddd; }
+          .button { display: inline-block; background-color: #4a6ee0; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin: 10px 0; }
+          .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h2>Password Reset Request</h2>
+          </div>
+          <div class="content">
+            <p>Hello ${user.firstName},</p>
+            <p>You requested to reset your password for your Expense Tracker account.</p>
+            
+            <div id="web-link">
+              <!-- For desktop devices -->
+              <a href="${webLink}" class="button">Reset Password</a>
+            </div>
+            
+            <p>This link will expire in 1 hour for security reasons.</p>
+            <p>If you didn't request this reset, please ignore this email.</p>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} Expense Tracker. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: user.email,
-      subject: "Password Reset Request",
-      html: `<p>Click <a href="${resetUrl}">here</a> to reset your password.</p><p>This link expires in 1 hour.</p>`,
+      subject: "Password Reset Request - Expense Tracker",
+      html: htmlEmail,
     };
 
     console.log("📤 Sending email to:", user.email);
@@ -137,9 +179,9 @@ export const forgotPassword = async (req: Request<{}, {}, { email: string }>, re
   }
 };
 
-export const resetPassword = async (req: Request<{}, {}, { token: string; newPassword: string }>, res: Response): Promise<void> => {
+export const resetPassword = async (req: Request<{}, {}, { token: string; password: string }>, res: Response): Promise<void> => {
   try {
-    const { token, newPassword } = req.body;
+    const { token, password } = req.body;
 
     // Hash token to match stored token
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
@@ -155,9 +197,8 @@ export const resetPassword = async (req: Request<{}, {}, { token: string; newPas
       return;
     }
 
-    // Hash new password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
+    // Assign new password directly – hashing will be handled by pre('save') middleware
+    user.password = password;
 
     // Clear reset token fields
     user.resetPasswordToken = null;

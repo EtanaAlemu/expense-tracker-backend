@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Transaction } from '../models/Transaction';
 import { CreateTransactionRequest, UpdateTransactionRequest } from '../dto/transaction.dto';
+import mongoose from 'mongoose';
 
 // Add a new transaction (Income/Expense)
 export const addTransaction = async (req: Request<{}, {}, CreateTransactionRequest>, res: Response): Promise<void> => {
@@ -73,10 +74,95 @@ export const deleteTransaction = async (req: Request<{ id: string }>, res: Respo
 };
 
 // Admin: Get all transactions from all users
-export const getAllTransactions = async (_req: Request, res: Response): Promise<void> => {
+export const getAllTransactions = async (req: Request, res: Response): Promise<void> => {
   try {
-    const transactions = await Transaction.find();
-    res.status(200).json(transactions);
+    const page = parseInt(req.query.page as string) || 0;
+    const size = parseInt(req.query.size as string) || 10;
+    const query = (req.query.query as string) || '';
+    const minAmount = parseFloat(req.query.minAmount as string);
+    const maxAmount = parseFloat(req.query.maxAmount as string);
+    const startDate = req.query.startDate as string;
+    const endDate = req.query.endDate as string;
+    const category = req.query.category as string;
+    const type = req.query.type as string;
+    const id = req.query.id as string;
+
+    // Build search query
+    const searchQuery: any = {};
+
+    // ID filter
+    if (id) {
+      try {
+        searchQuery._id = new mongoose.Types.ObjectId(id);
+      } catch (error) {
+        res.status(400).json({ 
+          message: "Invalid transaction ID format", 
+          error: "Transaction ID must be a valid MongoDB ObjectId" 
+        });
+        return;
+      }
+    }
+
+    // Text search
+    if (query) {
+      searchQuery.$or = [
+        { description: { $regex: query, $options: 'i' } }
+      ];
+    }
+
+    // Amount range filter
+    if (!isNaN(minAmount) || !isNaN(maxAmount)) {
+      searchQuery.amount = {};
+      if (!isNaN(minAmount)) searchQuery.amount.$gte = minAmount;
+      if (!isNaN(maxAmount)) searchQuery.amount.$lte = maxAmount;
+    }
+
+    // Date range filter
+    if (startDate || endDate) {
+      searchQuery.date = {};
+      if (startDate) searchQuery.date.$gte = new Date(startDate);
+      if (endDate) searchQuery.date.$lte = new Date(endDate);
+    }
+
+    // Category filter
+    if (category) {
+      try {
+        searchQuery.category = new mongoose.Types.ObjectId(category);
+      } catch (error) {
+        res.status(400).json({ 
+          message: "Invalid category ID format", 
+          error: "Category ID must be a valid MongoDB ObjectId" 
+        });
+        return;
+      }
+    }
+
+    // Type filter
+    if (type) {
+      searchQuery.type = type;
+    }
+
+    // Get total count
+    const totalElements = await Transaction.countDocuments(searchQuery);
+    const totalPages = Math.ceil(totalElements / size);
+
+    // Get paginated results with populated user and category
+    const transactions = await Transaction.find(searchQuery)
+      .populate('user', 'firstName lastName email')
+      .populate('category', 'name description icon color')
+      .sort({ date: -1 })
+      .skip(page * size)
+      .limit(size);
+
+    res.status(200).json({
+      content: transactions,
+      page: {
+        size,
+        number: page,
+        totalElements,
+        totalPages
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error instanceof Error ? error.message : 'Unknown error' });
   }

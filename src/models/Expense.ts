@@ -1,10 +1,9 @@
 import mongoose, { Document, Model } from 'mongoose';
 import { IExpense } from '../types';
-import { BudgetCategory } from './Budget';
 
 export interface IExpenseDocument extends Omit<IExpense, '_id'>, Document {
   user: mongoose.Types.ObjectId;
-  category: BudgetCategory;
+  category: mongoose.Types.ObjectId;
 }
 
 interface IExpenseModel extends Model<IExpenseDocument> {
@@ -23,9 +22,9 @@ const ExpenseSchema = new mongoose.Schema<IExpenseDocument, IExpenseModel>(
       required: [true, "Amount is required"],
     },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
       required: [true, "Category is required"],
-      enum: ["Food", "Transport", "Entertainment", "Bills", "Shopping", "Other"],
     },
     description: {
       type: String,

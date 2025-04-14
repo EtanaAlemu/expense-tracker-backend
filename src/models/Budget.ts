@@ -1,11 +1,9 @@
 import mongoose, { Document, Model } from 'mongoose';
 import { IBudget } from '../types';
 
-export type BudgetCategory = 'Food' | 'Transport' | 'Entertainment' | 'Bills' | 'Shopping' | 'Other';
-
 export interface IBudgetDocument extends Omit<IBudget, '_id'>, Document {
   user: mongoose.Types.ObjectId;
-  category: BudgetCategory;
+  category: mongoose.Types.ObjectId;
   limit: number;
   startDate: Date;
   endDate: Date;
@@ -23,9 +21,9 @@ const BudgetSchema = new mongoose.Schema<IBudgetDocument, IBudgetModel>(
       required: true,
     },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
       required: [true, "Category is required"],
-      enum: ["Food", "Transport", "Entertainment", "Bills", "Shopping", "Other"],
     },
     limit: {
       type: Number,

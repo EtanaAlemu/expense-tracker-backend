@@ -10,8 +10,10 @@ import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import expenseRoutes from './routes/expenseRoutes';
 import budgetRoutes from './routes/budgetRoutes';
+import categoryRoutes from './routes/categoryRoutes';
 import transactionRoutes from './routes/transactionRoutes';
 import swaggerRoutes from './routes/swaggerRoutes';
+
 
 // Load environment variables
 dotenv.config();
@@ -32,6 +34,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/budgets", budgetRoutes);
+app.use('/api/categories', categoryRoutes); 
 app.use("/api/transactions", transactionRoutes);
 app.use("/api-docs", swaggerRoutes);
 

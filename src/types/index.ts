@@ -1,44 +1,58 @@
+import { Types } from 'mongoose';
+
 export interface IUser {
-    _id: string;
-    email: string;
-    password: string;
+    _id?: Types.ObjectId;
     firstName: string;
     lastName: string;
-    createdAt: Date;
-    updatedAt: Date;
+    email: string;
+    password: string;
+    role?: 'user' | 'admin';
+    currency?: string;
+    active?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface ITransaction {
-    _id: string;
-    amount: number;
+    _id?: Types.ObjectId;
+    user: Types.ObjectId;
     type: 'Income' | 'Expense';
-    category: string;
-    description: string;
+    amount: number;
+    category: Types.ObjectId;
+    description?: string;
     date: Date;
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface IBudget {
-    _id: string;
-    category: string;
+    _id?: Types.ObjectId;
+    user: Types.ObjectId;
+    category: Types.ObjectId;
     limit: number;
     startDate: Date;
     endDate: Date;
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface IExpense {
-    _id: string;
+    _id?: Types.ObjectId;
+    user: Types.ObjectId;
     amount: number;
-    category: string;
-    description: string;
+    category: Types.ObjectId;
+    description?: string;
     date: Date;
-    receipt?: string;
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+export interface ICategory {
+    _id?: Types.ObjectId;
+    name: string;
+    description?: string;
+    icon?: string;
+    color?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 } 

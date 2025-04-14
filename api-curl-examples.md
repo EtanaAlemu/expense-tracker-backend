@@ -64,9 +64,15 @@ curl -X POST http://localhost:5000/api/auth/forgot-password \
 Response (200 OK):
 ```json
 {
-  "message": "Password reset email sent"
+  "message": "Password reset link sent to your email"
 }
 ```
+
+> **Note:** The password reset email now includes both:
+> - A mobile deep link (format: `expensetracker://reset-password?token=RESET_TOKEN`) for users on mobile devices
+> - A web link (format: `http://example.com/reset-password?token=RESET_TOKEN`) for users on desktop computers
+> 
+> This allows users to reset their password on the same device they're viewing the email without needing to switch devices.
 
 ### Reset Password
 ```bash

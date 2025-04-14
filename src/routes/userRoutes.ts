@@ -2,7 +2,7 @@ import express from 'express';
 import { 
   getUserProfile, 
   updateUserProfile, 
-  getAllUsers, 
+  getUsers, 
   deleteUser, 
   updateUserRole, 
   deactivateUser, 
@@ -83,21 +83,88 @@ router.put("/profile", protect, updateUserProfile);
 // Admin Routes
 /**
  * @swagger
- * /api/users/all:
+ * /api/users:
  *   get:
- *     summary: Get all users (Admin only)
+ *     summary: Get users (Admin only)
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         description: Page number (0-based)
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *       - name: size
+ *         in: query
+ *         description: Number of items per page
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - name: query
+ *         in: query
+ *         description: Search text for first name, last name, or email
+ *         schema:
+ *           type: string
+ *       - name: userId
+ *         in: query
+ *         description: Filter by specific user ID
+ *         schema:
+ *           type: string
+ *       - name: role
+ *         in: query
+ *         description: Filter by user role
+ *         schema:
+ *           type: string
+ *           enum: [user, admin]
+ *       - name: isActive
+ *         in: query
+ *         description: Filter by account status
+ *         schema:
+ *           type: string
+ *           enum: [true, false]
+ *       - name: startDate
+ *         in: query
+ *         description: Start date for account creation (YYYY-MM-DD)
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - name: endDate
+ *         in: query
+ *         description: End date for account creation (YYYY-MM-DD)
+ *         schema:
+ *           type: string
+ *           format: date
  *     responses:
  *       200:
- *         description: A list of all users
+ *         description: Paginated list of users
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 content:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *                 page:
+ *                   type: object
+ *                   properties:
+ *                     size:
+ *                       type: integer
+ *                       description: Number of items per page
+ *                     number:
+ *                       type: integer
+ *                       description: Current page number (0-based)
+ *                     totalElements:
+ *                       type: integer
+ *                       description: Total number of items
+ *                     totalPages:
+ *                       type: integer
+ *                       description: Total number of pages
+ *       400:
+ *         description: Invalid user ID format
  *       401:
  *         description: Not authorized, no token
  *       403:
@@ -106,7 +173,7 @@ router.put("/profile", protect, updateUserProfile);
  *         description: Server error
  */
 
-router.get("/all", protect, adminProtect, getAllUsers);
+router.get("/", protect, adminProtect, getUsers);
 
 /**
  * @swagger

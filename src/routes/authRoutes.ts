@@ -105,6 +105,7 @@ router.post("/login", loginUser);
  *   post:
  *     summary: Request password reset
  *     tags: [Authentication]
+ *     description: Sends an email with password reset links - one for mobile app (deep link) and one for web browser
  *     requestBody:
  *       required: true
  *       content:
@@ -119,7 +120,7 @@ router.post("/login", loginUser);
  *               - email
  *     responses:
  *       200:
- *         description: Password reset link sent to email
+ *         description: Password reset links sent to email (includes both mobile deep link and web browser link)
  *       400:
  *         description: User with this email does not exist
  *       500:
@@ -134,6 +135,7 @@ router.post("/forgot-password", forgotPassword);
  *   post:
  *     summary: Reset password using token
  *     tags: [Authentication]
+ *     description: Resets user password using token received via email (works for both mobile and web)
  *     requestBody:
  *       required: true
  *       content:
@@ -143,6 +145,7 @@ router.post("/forgot-password", forgotPassword);
  *             properties:
  *               token:
  *                 type: string
+ *                 description: Token received in the password reset email via deep link or web link
  *               newPassword:
  *                 type: string
  *                 format: password
