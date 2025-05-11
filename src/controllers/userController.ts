@@ -1,10 +1,12 @@
-import { Request, Response } from 'express';
-import { User } from '../models/User';
-import { UpdateUserRequest } from '../dto/user.dto';
-import mongoose from 'mongoose';
+import { Request, Response } from "express";
+import { User, IUserDocument } from "../models/User";
+import { UpdateUserRequest } from "../dto/user.dto";
+import mongoose from "mongoose";
 
-
-export const getUserProfile = async (req: Request, res: Response): Promise<void> => {
+export const getUserProfile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const user = await User.findById(req.user?.id).select("-password");
     if (!user) {
@@ -14,34 +16,93 @@ export const getUserProfile = async (req: Request, res: Response): Promise<void>
 
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error instanceof Error ? error.message : 'Unknown error' });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
-export const updateUserProfile = async (req: Request<{}, {}, UpdateUserRequest>, res: Response): Promise<void> => {
+export const updateUserProfile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const user = await User.findById(req.user?.id);
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "Not authenticated" });
+      return;
+    }
+
+    const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
     }
 
-    user.firstName = req.body.firstName || user.firstName;
-    user.lastName = req.body.lastName || user.lastName;
-    user.email = req.body.email || user.email;
+    const { firstName, lastName, email, image, currency, language } =
+      req.body as UpdateUserRequest;
 
-    const updatedUser = await user.save();
-    res.status(200).json({
+    // Validate email if provided
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        res.status(400).json({ message: "Email already in use" });
+        return;
+      }
+    }
+
+    // Validate language if provided
+    if (language && !["en", "am", "om"].includes(language)) {
+      res.status(400).json({
+        message: "Invalid language",
+        supportedLanguages: ["en", "am", "om"],
+      });
+      return;
+    }
+
+    // Validate image if provided
+    if (image) {
+      if (!image.startsWith("data:image/")) {
+        res.status(400).json({
+          message: "Invalid image format. Must be a base64 encoded image.",
+        });
+        return;
+      }
+
+      const base64Data = image.split(",")[1];
+      const sizeInBytes = Math.ceil((base64Data.length * 3) / 4);
+      const sizeInMB = sizeInBytes / (1024 * 1024);
+
+      if (sizeInMB > 5) {
+        res.status(400).json({ message: "Image size must be less than 5MB" });
+        return;
+      }
+    }
+
+    const updateFields: Partial<IUserDocument> = {};
+    if (firstName) updateFields.firstName = firstName;
+    if (lastName) updateFields.lastName = lastName;
+    if (email) updateFields.email = email;
+    if (image) updateFields.image = image;
+    if (currency) updateFields.currency = currency;
+    if (language) updateFields.language = language;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateFields },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    res.json({
       message: "Profile updated successfully",
-      user: {
-        id: updatedUser._id,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        email: updatedUser.email,
-      },
+      user: updatedUser,
     });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error instanceof Error ? error.message : 'Unknown error' });
+  } catch (error: any) {
+    console.error("Error updating user profile:", error);
+    res
+      .status(500)
+      .json({ message: "Error updating profile", error: error.message });
   }
 };
 
@@ -49,7 +110,7 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 0;
     const size = parseInt(req.query.size as string) || 10;
-    const query = (req.query.query as string) || '';
+    const query = (req.query.query as string) || "";
     const role = req.query.role as string;
     const isActive = req.query.isActive as string;
     const startDate = req.query.startDate as string;
@@ -62,9 +123,9 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
     // Text search
     if (query) {
       searchQuery.$or = [
-        { firstName: { $regex: query, $options: 'i' } },
-        { lastName: { $regex: query, $options: 'i' } },
-        { email: { $regex: query, $options: 'i' } }
+        { firstName: { $regex: query, $options: "i" } },
+        { lastName: { $regex: query, $options: "i" } },
+        { email: { $regex: query, $options: "i" } },
       ];
     }
 
@@ -73,9 +134,9 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
       try {
         searchQuery._id = new mongoose.Types.ObjectId(id);
       } catch (error) {
-        res.status(400).json({ 
-          message: "Invalid user ID format", 
-          error: "User ID must be a valid MongoDB ObjectId" 
+        res.status(400).json({
+          message: "Invalid user ID format",
+          error: "User ID must be a valid MongoDB ObjectId",
         });
         return;
       }
@@ -88,7 +149,7 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 
     // Active status filter
     if (isActive !== undefined) {
-      searchQuery.isActive = isActive === 'true';
+      searchQuery.isActive = isActive === "true";
     }
 
     // Date range filter (for createdAt)
@@ -115,15 +176,21 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
         size,
         number: page,
         totalElements,
-        totalPages
-      }
+        totalPages,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error instanceof Error ? error.message : 'Unknown error' });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
-export const deleteUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+export const deleteUser = async (
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<void> => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -134,11 +201,17 @@ export const deleteUser = async (req: Request<{ id: string }>, res: Response): P
     await user.deleteOne();
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error instanceof Error ? error.message : 'Unknown error' });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
-export const updateUserRole = async (req: Request<{ id: string }, {}, { role: 'user' | 'admin' }>, res: Response): Promise<void> => {
+export const updateUserRole = async (
+  req: Request<{ id: string }, {}, { role: "user" | "admin" }>,
+  res: Response
+): Promise<void> => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -158,11 +231,17 @@ export const updateUserRole = async (req: Request<{ id: string }, {}, { role: 'u
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error instanceof Error ? error.message : 'Unknown error' });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
-export const deactivateUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+export const deactivateUser = async (
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<void> => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -175,11 +254,17 @@ export const deactivateUser = async (req: Request<{ id: string }>, res: Response
 
     res.status(200).json({ message: "User account deactivated" });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error instanceof Error ? error.message : 'Unknown error' });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
-export const activateUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+export const activateUser = async (
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<void> => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -198,6 +283,9 @@ export const activateUser = async (req: Request<{ id: string }>, res: Response):
 
     res.status(200).json({ message: "User account activated" });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error instanceof Error ? error.message : 'Unknown error' });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
-}; 
+};

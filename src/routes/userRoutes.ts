@@ -1,14 +1,14 @@
-import express from 'express';
-import { 
-  getUserProfile, 
-  updateUserProfile, 
-  getUsers, 
-  deleteUser, 
-  updateUserRole, 
-  deactivateUser, 
-  activateUser  
-} from '../controllers/userController';
-import { protect, adminProtect } from '../middleware/authMiddleware';
+import express from "express";
+import {
+  getUserProfile,
+  updateUserProfile,
+  getUsers,
+  deleteUser,
+  updateUserRole,
+  deactivateUser,
+  activateUser,
+} from "../controllers/userController";
+import { protect, adminProtect } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -53,11 +53,24 @@ router.get("/profile", protect, getUserProfile);
  *             properties:
  *               firstName:
  *                 type: string
+ *                 description: User's first name
  *               lastName:
  *                 type: string
+ *                 description: User's last name
  *               email:
  *                 type: string
  *                 format: email
+ *                 description: User's email address
+ *               image:
+ *                 type: string
+ *                 description: Base64 encoded image (max 5MB)
+ *               currency:
+ *                 type: string
+ *                 description: User's preferred currency
+ *               language:
+ *                 type: string
+ *                 enum: [en, am, om]
+ *                 description: User's preferred language (en=English, am=Amharic, om=Afaan Oromoo)
  *     responses:
  *       200:
  *         description: Profile updated successfully
@@ -69,9 +82,39 @@ router.get("/profile", protect, getUserProfile);
  *                 message:
  *                   type: string
  *                 user:
- *                   $ref: '#/components/schemas/User'
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     firstName:
+ *                       type: string
+ *                     lastName:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     image:
+ *                       type: string
+ *                     currency:
+ *                       type: string
+ *                     language:
+ *                       type: string
+ *                       enum: [en, am, om]
+ *       400:
+ *         description: Invalid input, email already in use, or unsupported language
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 supportedLanguages:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: List of supported languages (only included for language validation errors)
  *       401:
- *         description: Not authorized, no token
+ *         description: Not authenticated
  *       404:
  *         description: User not found
  *       500:
@@ -308,4 +351,4 @@ router.put("/:id/deactivate", protect, adminProtect, deactivateUser);
 
 router.put("/:id/activate", protect, adminProtect, activateUser);
 
-export default router; 
+export default router;

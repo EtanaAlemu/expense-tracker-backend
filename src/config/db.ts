@@ -12,7 +12,6 @@ const connectDB = async (): Promise<void> => {
       useUnifiedTopology: true,
     } as mongoose.ConnectOptions);
 
-    console.log("✅ MongoDB Connected Successfully");
   } catch (err) {
     console.error("❌ MongoDB Connection Failed:", err instanceof Error ? err.message : 'Unknown error');
     process.exit(1); // Exit process with failure

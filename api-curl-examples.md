@@ -3,6 +3,7 @@
 ## Authentication Endpoints
 
 ### Register User
+
 ```bash
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
@@ -15,6 +16,7 @@ curl -X POST http://localhost:5000/api/auth/register \
 ```
 
 Response (201 Created):
+
 ```json
 {
   "message": "User registered successfully",
@@ -29,6 +31,7 @@ Response (201 Created):
 ```
 
 ### Login User
+
 ```bash
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
@@ -39,6 +42,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "Login successful",
@@ -53,6 +57,7 @@ Response (200 OK):
 ```
 
 ### Forgot Password
+
 ```bash
 curl -X POST http://localhost:5000/api/auth/forgot-password \
   -H "Content-Type: application/json" \
@@ -62,6 +67,7 @@ curl -X POST http://localhost:5000/api/auth/forgot-password \
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "Password reset link sent to your email"
@@ -69,12 +75,14 @@ Response (200 OK):
 ```
 
 > **Note:** The password reset email now includes both:
+>
 > - A mobile deep link (format: `expensetracker://reset-password?token=RESET_TOKEN`) for users on mobile devices
 > - A web link (format: `http://example.com/reset-password?token=RESET_TOKEN`) for users on desktop computers
-> 
+>
 > This allows users to reset their password on the same device they're viewing the email without needing to switch devices.
 
 ### Reset Password
+
 ```bash
 curl -X POST http://localhost:5000/api/auth/reset-password \
   -H "Content-Type: application/json" \
@@ -85,6 +93,7 @@ curl -X POST http://localhost:5000/api/auth/reset-password \
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "Password reset successful"
@@ -94,12 +103,14 @@ Response (200 OK):
 ## User Profile Endpoints
 
 ### Get User Profile
+
 ```bash
 curl -X GET http://localhost:5000/api/users/profile \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 {
   "id": "65f1a2b3c4d5e6f7g8h9i0j1",
@@ -112,6 +123,7 @@ Response (200 OK):
 ```
 
 ### Update User Profile
+
 ```bash
 curl -X PUT http://localhost:5000/api/users/profile \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -124,6 +136,7 @@ curl -X PUT http://localhost:5000/api/users/profile \
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "Profile updated successfully",
@@ -139,12 +152,14 @@ Response (200 OK):
 ## Admin Endpoints
 
 ### Get All Users
+
 ```bash
 curl -X GET http://localhost:5000/api/users/all \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 [
   {
@@ -179,12 +194,14 @@ Response (200 OK):
 ```
 
 ### Delete User
+
 ```bash
 curl -X DELETE http://localhost:5000/api/admin/users/USER_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "User deleted successfully"
@@ -192,6 +209,7 @@ Response (200 OK):
 ```
 
 ### Update User Role
+
 ```bash
 curl -X PUT http://localhost:5000/api/users/USER_ID/role \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -202,6 +220,7 @@ curl -X PUT http://localhost:5000/api/users/USER_ID/role \
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "User role updated to admin",
@@ -213,12 +232,14 @@ Response (200 OK):
 ```
 
 ### Deactivate User
+
 ```bash
 curl -X PUT http://localhost:5000/api/users/USER_ID/deactivate \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "User account deactivated"
@@ -226,12 +247,14 @@ Response (200 OK):
 ```
 
 ### Activate User
+
 ```bash
 curl -X PUT http://localhost:5000/api/admin/users/USER_ID/activate \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "User account activated"
@@ -241,6 +264,7 @@ Response (200 OK):
 ## Budget Management Endpoints
 
 ### Create Budget
+
 ```bash
 curl -X POST http://localhost:5000/api/budgets \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -254,6 +278,7 @@ curl -X POST http://localhost:5000/api/budgets \
 ```
 
 Response (201 Created):
+
 ```json
 {
   "_id": "65f1a2b3c4d5e6f7g8h9i0j1",
@@ -268,12 +293,14 @@ Response (201 Created):
 ```
 
 ### Get All Budgets
+
 ```bash
 curl -X GET http://localhost:5000/api/budgets \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 [
   {
@@ -290,6 +317,7 @@ Response (200 OK):
 ```
 
 ### Update Budget
+
 ```bash
 curl -X PUT http://localhost:5000/api/budgets/BUDGET_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -301,6 +329,7 @@ curl -X PUT http://localhost:5000/api/budgets/BUDGET_ID \
 ```
 
 Response (200 OK):
+
 ```json
 {
   "_id": "65f1a2b3c4d5e6f7g8h9i0j1",
@@ -315,12 +344,14 @@ Response (200 OK):
 ```
 
 ### Delete Budget
+
 ```bash
 curl -X DELETE http://localhost:5000/api/budgets/BUDGET_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "Budget deleted successfully"
@@ -328,12 +359,14 @@ Response (200 OK):
 ```
 
 ### Get All Budgets (Admin)
+
 ```bash
 curl -X GET http://localhost:5000/api/budgets/admin/all \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 [
   {
@@ -356,12 +389,14 @@ Response (200 OK):
 ```
 
 ### Delete Budget (Admin)
+
 ```bash
 curl -X DELETE http://localhost:5000/api/budgets/admin/BUDGET_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "Budget deleted successfully by admin"
@@ -371,6 +406,7 @@ Response (200 OK):
 ## Expense Management Endpoints
 
 ### Create Expense
+
 ```bash
 curl -X POST http://localhost:5000/api/expenses \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -385,11 +421,12 @@ curl -X POST http://localhost:5000/api/expenses \
 ```
 
 Response (201 Created):
+
 ```json
 {
   "_id": "65f1a2b3c4d5e6f7g8h9i0j1",
   "user": "65f1a2b3c4d5e6f7g8h9i0j1",
-  "amount": 50.00,
+  "amount": 50.0,
   "category": "Groceries",
   "description": "Weekly groceries",
   "date": "2024-03-13T00:00:00.000Z",
@@ -400,18 +437,20 @@ Response (201 Created):
 ```
 
 ### Get All Expenses
+
 ```bash
 curl -X GET http://localhost:5000/api/expenses \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 [
   {
     "_id": "65f1a2b3c4d5e6f7g8h9i0j1",
     "user": "65f1a2b3c4d5e6f7g8h9i0j1",
-    "amount": 50.00,
+    "amount": 50.0,
     "category": "Groceries",
     "description": "Weekly groceries",
     "date": "2024-03-13T00:00:00.000Z",
@@ -423,6 +462,7 @@ Response (200 OK):
 ```
 
 ### Update Expense
+
 ```bash
 curl -X PUT http://localhost:5000/api/expenses/EXPENSE_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -434,11 +474,12 @@ curl -X PUT http://localhost:5000/api/expenses/EXPENSE_ID \
 ```
 
 Response (200 OK):
+
 ```json
 {
   "_id": "65f1a2b3c4d5e6f7g8h9i0j1",
   "user": "65f1a2b3c4d5e6f7g8h9i0j1",
-  "amount": 55.00,
+  "amount": 55.0,
   "category": "Groceries",
   "description": "Updated description",
   "date": "2024-03-13T00:00:00.000Z",
@@ -449,12 +490,14 @@ Response (200 OK):
 ```
 
 ### Delete Expense
+
 ```bash
 curl -X DELETE http://localhost:5000/api/expenses/EXPENSE_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "Expense deleted successfully"
@@ -462,12 +505,14 @@ Response (200 OK):
 ```
 
 ### Get All Expenses (Admin)
+
 ```bash
 curl -X GET http://localhost:5000/api/expenses/admin/all \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 [
   {
@@ -487,12 +532,14 @@ Response (200 OK):
 ```
 
 ### Admin: Delete Any Expense
+
 ```bash
 curl -X DELETE http://localhost:5000/api/expenses/admin/EXPENSE_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "Expense deleted successfully by admin"
@@ -502,6 +549,7 @@ Response (200 OK):
 ## Transaction Management Endpoints
 
 ### Create Transaction
+
 ```bash
 curl -X POST http://localhost:5000/api/transactions \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -516,12 +564,13 @@ curl -X POST http://localhost:5000/api/transactions \
 ```
 
 Response (201 Created):
+
 ```json
 {
   "_id": "65f1a2b3c4d5e6f7g8h9i0j1",
   "user": "65f1a2b3c4d5e6f7g8h9i0j1",
   "type": "expense",
-  "amount": 50.00,
+  "amount": 50.0,
   "category": "Groceries",
   "description": "Weekly groceries",
   "date": "2024-03-13T00:00:00.000Z",
@@ -531,19 +580,21 @@ Response (201 Created):
 ```
 
 ### Get All Transactions
+
 ```bash
 curl -X GET http://localhost:5000/api/transactions \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 [
   {
     "_id": "65f1a2b3c4d5e6f7g8h9i0j1",
     "user": "65f1a2b3c4d5e6f7g8h9i0j1",
     "type": "expense",
-    "amount": 50.00,
+    "amount": 50.0,
     "category": "Groceries",
     "description": "Weekly groceries",
     "date": "2024-03-13T00:00:00.000Z",
@@ -554,6 +605,7 @@ Response (200 OK):
 ```
 
 ### Update Transaction
+
 ```bash
 curl -X PUT http://localhost:5000/api/transactions/TRANSACTION_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -565,12 +617,13 @@ curl -X PUT http://localhost:5000/api/transactions/TRANSACTION_ID \
 ```
 
 Response (200 OK):
+
 ```json
 {
   "_id": "65f1a2b3c4d5e6f7g8h9i0j1",
   "user": "65f1a2b3c4d5e6f7g8h9i0j1",
   "type": "expense",
-  "amount": 55.00,
+  "amount": 55.0,
   "category": "Groceries",
   "description": "Updated description",
   "date": "2024-03-13T00:00:00.000Z",
@@ -580,12 +633,14 @@ Response (200 OK):
 ```
 
 ### Delete Transaction
+
 ```bash
 curl -X DELETE http://localhost:5000/api/transactions/TRANSACTION_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "Transaction deleted successfully"
@@ -593,12 +648,14 @@ Response (200 OK):
 ```
 
 ### Get All Transactions (Admin)
+
 ```bash
 curl -X GET http://localhost:5000/api/transactions/admin \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 [
   {
@@ -617,12 +674,14 @@ Response (200 OK):
 ```
 
 ### Admin: Delete Any Transaction
+
 ```bash
 curl -X DELETE http://localhost:5000/api/transactions/admin/TRANSACTION_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 Response (200 OK):
+
 ```json
 {
   "message": "Transaction deleted successfully by admin"
@@ -632,6 +691,7 @@ Response (200 OK):
 ## Error Responses
 
 ### User Already Exists
+
 ```json
 {
   "message": "User already exists"
@@ -639,6 +699,7 @@ Response (200 OK):
 ```
 
 ### Access Denied
+
 ```json
 {
   "message": "Access denied, admin only"
@@ -646,6 +707,7 @@ Response (200 OK):
 ```
 
 ### Not Found
+
 ```json
 {
   "message": "Resource not found"
@@ -653,6 +715,7 @@ Response (200 OK):
 ```
 
 ### Invalid Credentials
+
 ```json
 {
   "message": "Invalid email or password"
@@ -660,9 +723,260 @@ Response (200 OK):
 ```
 
 ### Server Error
+
 ```json
 {
   "message": "Server error",
   "error": "Error details"
 }
-``` 
+```
+
+## Category Management Endpoints
+
+### Create Category
+
+```bash
+curl -X POST http://localhost:5000/api/categories \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Food",
+    "description": "Food and dining expenses",
+    "icon": "food",
+    "color": "#FF5733"
+  }'
+```
+
+Response (201 Created):
+
+```json
+{
+  "_id": "67fd1b014f288bf717c323e8",
+  "name": "Food",
+  "description": "Food and dining expenses",
+  "icon": "food",
+  "color": "#FF5733",
+  "isDefault": false,
+  "createdAt": "2024-03-13T12:00:00.000Z",
+  "updatedAt": "2024-03-13T12:00:00.000Z",
+  "__v": 0
+}
+```
+
+Error Response (400 Bad Request):
+
+```json
+{
+  "message": "Name is required"
+}
+```
+
+Error Response (409 Conflict):
+
+```json
+{
+  "message": "Server error",
+  "error": "E11000 duplicate key error collection: expense-tracker-db.categories index: name_1 dup key: { name: \"Food\" }"
+}
+```
+
+### Get All Categories
+
+```bash
+curl -X GET http://localhost:5000/api/categories \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+Response (200 OK):
+
+```json
+[
+  {
+    "_id": "67fd1b014f288bf717c323e8",
+    "name": "Food",
+    "description": "Food and dining expenses",
+    "icon": "food",
+    "color": "#FF5733",
+    "isDefault": false,
+    "createdAt": "2024-03-13T12:00:00.000Z",
+    "updatedAt": "2024-03-13T12:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "67fd1b014f288bf717c323e9",
+    "name": "Transport",
+    "description": "Transportation expenses",
+    "icon": "transport",
+    "color": "#33FF57",
+    "isDefault": false,
+    "createdAt": "2024-03-13T12:00:00.000Z",
+    "updatedAt": "2024-03-13T12:00:00.000Z",
+    "__v": 0
+  }
+]
+```
+
+### Get Category by ID
+
+```bash
+curl -X GET http://localhost:5000/api/categories/67fd1b014f288bf717c323e8 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+Response (200 OK):
+
+```json
+{
+  "_id": "67fd1b014f288bf717c323e8",
+  "name": "Food",
+  "description": "Food and dining expenses",
+  "icon": "food",
+  "color": "#FF5733",
+  "isDefault": false,
+  "createdAt": "2024-03-13T12:00:00.000Z",
+  "updatedAt": "2024-03-13T12:00:00.000Z",
+  "__v": 0
+}
+```
+
+Error Response (404 Not Found):
+
+```json
+{
+  "message": "Category not found"
+}
+```
+
+### Update Category
+
+```bash
+curl -X PUT http://localhost:5000/api/categories/67fd1b014f288bf717c323e8 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Food & Dining",
+    "description": "Updated food category description",
+    "icon": "food",
+    "color": "#FF5733"
+  }'
+```
+
+Response (200 OK):
+
+```json
+{
+  "_id": "67fd1b014f288bf717c323e8",
+  "name": "Food & Dining",
+  "description": "Updated food category description",
+  "icon": "food",
+  "color": "#FF5733",
+  "isDefault": false,
+  "createdAt": "2024-03-13T12:00:00.000Z",
+  "updatedAt": "2024-03-13T12:00:00.000Z",
+  "__v": 0
+}
+```
+
+Error Response (404 Not Found):
+
+```json
+{
+  "message": "Category not found"
+}
+```
+
+### Delete Category
+
+```bash
+curl -X DELETE http://localhost:5000/api/categories/67fd1b014f288bf717c323e8 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+Response (200 OK):
+
+```json
+{
+  "message": "Category deleted successfully"
+}
+```
+
+Error Response (404 Not Found):
+
+```json
+{
+  "message": "Category not found"
+}
+```
+
+### Get All Categories (Admin)
+
+```bash
+curl -X GET http://localhost:5000/api/categories/admin?page=0&size=10&query=trans \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+Response (200 OK):
+
+```json
+{
+  "content": [
+    {
+      "_id": "67fd1b014f288bf717c323e9",
+      "name": "Transport",
+      "description": "Transportation expenses",
+      "icon": "transport",
+      "color": "#33FF57",
+      "isDefault": false,
+      "createdAt": "2024-03-13T12:00:00.000Z",
+      "updatedAt": "2024-03-13T12:00:00.000Z",
+      "__v": 0
+    }
+  ],
+  "page": {
+    "size": 10,
+    "number": 0,
+    "totalElements": 1,
+    "totalPages": 1
+  }
+}
+```
+
+Error Response (500 Server Error):
+
+```json
+{
+  "message": "Server error",
+  "error": "Cast to ObjectId failed for value \"admin\" (type string) at path \"_id\" for model \"Category\""
+}
+```
+
+### Delete Any Category (Admin)
+
+```bash
+curl -X DELETE http://localhost:5000/api/categories/admin/67fd1b014f288bf717c323e8 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+Response (200 OK):
+
+```json
+{
+  "message": "Category deleted successfully by admin"
+}
+```
+
+Error Response (404 Not Found):
+
+```json
+{
+  "message": "Category not found"
+}
+```
+
+Error Response (403 Forbidden):
+
+```json
+{
+  "message": "Access denied, admin only"
+}
+```

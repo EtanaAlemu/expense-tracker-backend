@@ -1,11 +1,18 @@
-import mongoose, { Document, Model } from 'mongoose';
+import mongoose, { Document, Model, Types } from "mongoose";
+
+export enum CategoryType {
+  INCOME = "Income",
+  EXPENSE = "Expense",
+}
 
 export interface ICategoryDocument extends Document {
   name: string;
   description?: string;
   icon?: string;
   color?: string;
+  type: CategoryType;
   isDefault: boolean;
+  createdBy?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,12 +41,25 @@ const CategorySchema = new mongoose.Schema<ICategoryDocument, ICategoryModel>(
       type: String,
       trim: true,
     },
+    type: {
+      type: String,
+      enum: Object.values(CategoryType),
+      required: [true, "Category type is required"],
+      default: CategoryType.EXPENSE,
+    },
     isDefault: {
       type: Boolean,
       default: false,
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   { timestamps: true }
 );
 
-export const Category = mongoose.model<ICategoryDocument, ICategoryModel>("Category", CategorySchema); 
+export const Category = mongoose.model<ICategoryDocument, ICategoryModel>(
+  "Category",
+  CategorySchema
+);

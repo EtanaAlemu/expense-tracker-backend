@@ -1,7 +1,13 @@
-import express from 'express';
-import { addCategory, getCategories, getCategory, updateCategory, deleteCategory } from '../controllers/categoryController';
+import express from "express";
+import {
+  addCategory,
+  getCategories,
+  getCategory,
+  updateCategory,
+  deleteCategory,
+} from "../controllers/categoryController";
 
-import { protect, adminProtect } from '../middleware/authMiddleware';
+import { protect, authMiddleware } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -49,7 +55,7 @@ const router = express.Router();
  *       500:
  *         description: Server error
  */
-router.post('/', protect, adminProtect, addCategory);
+router.post("/", protect, addCategory);
 
 /**
  * @swagger
@@ -65,7 +71,7 @@ router.post('/', protect, adminProtect, addCategory);
  *       500:
  *         description: Server error
  */
-router.get('/', protect, getCategories);
+router.get("/", authMiddleware, getCategories);
 
 /**
  * @swagger
@@ -90,7 +96,7 @@ router.get('/', protect, getCategories);
  *       500:
  *         description: Server error
  */
-router.get('/:id', protect, getCategory);
+router.get("/:id", authMiddleware, getCategory);
 
 /**
  * @swagger
@@ -134,7 +140,7 @@ router.get('/:id', protect, getCategory);
  *       500:
  *         description: Server error
  */
-router.put('/:id', protect, adminProtect, updateCategory);
+router.put("/:id", protect, updateCategory);
 
 /**
  * @swagger
@@ -159,6 +165,6 @@ router.put('/:id', protect, adminProtect, updateCategory);
  *       500:
  *         description: Server error
  */
-router.delete('/:id', protect, adminProtect, deleteCategory);
+router.delete("/:id", protect, deleteCategory);
 
-export default router; 
+export default router;
