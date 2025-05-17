@@ -1,5 +1,5 @@
-import express from 'express';
-import { protect, adminProtect } from '../middleware/authMiddleware';
+import express from "express";
+import { protect, adminProtect } from "../middleware/authMiddleware";
 import {
   addTransaction,
   getTransactions,
@@ -7,7 +7,7 @@ import {
   deleteTransaction,
   getAllTransactions,
   deleteAnyTransaction,
-} from '../controllers/transactionController';
+} from "../controllers/transactionController";
 
 const router = express.Router();
 
@@ -26,9 +26,15 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             properties:
+ *               _id:
+ *                 type: string
+ *                 description: Optional custom MongoDB ObjectId
  *               type:
  *                 type: string
  *                 enum: [Income, Expense]
+ *               title:
+ *                 type: string
+ *                 description: Transaction title
  *               amount:
  *                 type: number
  *               category:
@@ -40,18 +46,66 @@ const router = express.Router();
  *                 format: date-time
  *             required:
  *               - type
+ *               - title
  *               - amount
  *               - category
  *               - date
  *     responses:
  *       201:
  *         description: Transaction created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Transaction'
+ *       200:
+ *         description: Transaction already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Transaction'
+ *                 message:
+ *                   type: string
+ *                   example: Transaction already exists
+ *       400:
+ *         description: Invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
  *       401:
  *         description: Not authorized, no token
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
  */
-router.post("/", protect, addTransaction); // Add a new transaction
+router.post("/", protect, addTransaction);
 
 /**
  * @swagger
@@ -64,12 +118,24 @@ router.post("/", protect, addTransaction); // Add a new transaction
  *     responses:
  *       200:
  *         description: List of transactions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Transaction'
  *       401:
  *         description: Not authorized, no token
  *       500:
  *         description: Server error
  */
-router.get("/", protect, getTransactions); // Get all transactions of the logged-in user
+router.get("/", protect, getTransactions);
 
 /**
  * @swagger
@@ -95,6 +161,8 @@ router.get("/", protect, getTransactions); // Get all transactions of the logged
  *               type:
  *                 type: string
  *                 enum: [Income, Expense]
+ *               title:
+ *                 type: string
  *               amount:
  *                 type: number
  *               category:
@@ -107,14 +175,28 @@ router.get("/", protect, getTransactions); // Get all transactions of the logged
  *     responses:
  *       200:
  *         description: Transaction updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Transaction'
+ *       400:
+ *         description: Invalid request
  *       401:
  *         description: Not authorized, no token
+ *       403:
+ *         description: Unauthorized to update this transaction
  *       404:
- *         description: Transaction not found or unauthorized
+ *         description: Transaction not found
  *       500:
  *         description: Server error
  */
-router.put("/:id", protect, updateTransaction); // Update an existing transaction
+router.put("/:id", protect, updateTransaction);
 
 /**
  * @swagger
@@ -133,6 +215,17 @@ router.put("/:id", protect, updateTransaction); // Update an existing transactio
  *     responses:
  *       200:
  *         description: Transaction deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Transaction deleted successfully
  *       401:
  *         description: Not authorized, no token
  *       404:
@@ -140,7 +233,7 @@ router.put("/:id", protect, updateTransaction); // Update an existing transactio
  *       500:
  *         description: Server error
  */
-router.delete("/:id", protect, deleteTransaction); // Delete a transaction by the user
+router.delete("/:id", protect, deleteTransaction);
 
 /**
  * @swagger
@@ -205,7 +298,7 @@ router.delete("/:id", protect, deleteTransaction); // Delete a transaction by th
  *         description: Filter by transaction type
  *         schema:
  *           type: string
- *           enum: [income, expense]
+ *           enum: [Income, Expense]
  *     responses:
  *       200:
  *         description: Paginated list of transactions
@@ -214,25 +307,31 @@ router.delete("/:id", protect, deleteTransaction); // Delete a transaction by th
  *             schema:
  *               type: object
  *               properties:
- *                 content:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Transaction'
- *                 page:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
  *                   type: object
  *                   properties:
- *                     size:
- *                       type: integer
- *                       description: Number of items per page
- *                     number:
- *                       type: integer
- *                       description: Current page number (0-based)
- *                     totalElements:
- *                       type: integer
- *                       description: Total number of items
- *                     totalPages:
- *                       type: integer
- *                       description: Total number of pages
+ *                     content:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Transaction'
+ *                     page:
+ *                       type: object
+ *                       properties:
+ *                         size:
+ *                           type: integer
+ *                           description: Number of items per page
+ *                         number:
+ *                           type: integer
+ *                           description: Current page number (0-based)
+ *                         totalElements:
+ *                           type: integer
+ *                           description: Total number of items
+ *                         totalPages:
+ *                           type: integer
+ *                           description: Total number of pages
  *       400:
  *         description: Invalid transaction ID or category ID format
  *       401:
@@ -242,7 +341,7 @@ router.delete("/:id", protect, deleteTransaction); // Delete a transaction by th
  *       500:
  *         description: Server error
  */
-router.get("/admin", protect, adminProtect, getAllTransactions); // Admin: Get all transactions
+router.get("/admin", protect, adminProtect, getAllTransactions);
 
 /**
  * @swagger
@@ -261,6 +360,17 @@ router.get("/admin", protect, adminProtect, getAllTransactions); // Admin: Get a
  *     responses:
  *       200:
  *         description: Transaction deleted successfully by admin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Transaction deleted successfully by admin
  *       401:
  *         description: Not authorized, no token
  *       403:
@@ -270,6 +380,49 @@ router.get("/admin", protect, adminProtect, getAllTransactions); // Admin: Get a
  *       500:
  *         description: Server error
  */
-router.delete("/admin/:id", protect, adminProtect, deleteAnyTransaction); // Admin: Delete any transaction
+router.delete("/admin/:id", protect, adminProtect, deleteAnyTransaction);
 
-export default router; 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Transaction:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: Transaction ID
+ *         user:
+ *           type: string
+ *           description: User ID
+ *         type:
+ *           type: string
+ *           enum: [Income, Expense]
+ *         title:
+ *           type: string
+ *           description: Transaction title
+ *         amount:
+ *           type: number
+ *         category:
+ *           type: string
+ *           description: Category ID
+ *         description:
+ *           type: string
+ *         date:
+ *           type: string
+ *           format: date-time
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *       required:
+ *         - type
+ *         - title
+ *         - amount
+ *         - category
+ *         - date
+ */
+
+export default router;

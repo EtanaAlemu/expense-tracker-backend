@@ -1,18 +1,22 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
+import { Currency, Language, Role } from "../constants/enums";
 
 export interface IUserDocument extends Document {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  role: "user" | "admin";
-  currency: string;
-  image: string | null;
-  language: "en" | "am" | "om";
+  image?: string;
+  currency: Currency;
+  language: Language;
+  role: Role;
   isActive: boolean;
-  resetPasswordToken: string | null;
-  resetPasswordExpires: Date | null;
+  isVerified: boolean;
+  verificationCode: string;
+  verificationCodeExpires: Date;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -51,39 +55,39 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
       type: String,
       default: null,
     },
-    role: {
-      type: String,
-      enum: ["user", "admin"],
-      default: "user",
-    },
     currency: {
       type: String,
-      default: "ETB",
+      enum: Currency,
+      default: Currency.BIRR,
     },
     language: {
       type: String,
-      enum: ["en", "am", "om"],
-      default: "en",
-      validate: {
-        validator: function (v: string) {
-          return ["en", "am", "om"].includes(v);
-        },
-        message: (props) =>
-          `${props.value} is not a supported language. Supported languages are: en, am, om`,
-      },
+      enum: Language,
+      default: Language.EN,
+    },
+    role: {
+      type: String,
+      enum: Role,
+      default: Role.USER,
     },
     isActive: {
       type: Boolean,
       default: true,
     },
-    resetPasswordToken: {
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationCode: {
       type: String,
       default: null,
     },
-    resetPasswordExpires: {
+    verificationCodeExpires: {
       type: Date,
       default: null,
     },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
     createdAt: {
       type: Date,
       default: Date.now,

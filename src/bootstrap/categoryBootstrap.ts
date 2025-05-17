@@ -1,4 +1,5 @@
-import { Category, CategoryType } from "../models/Category";
+import { Category } from "../models/Category";
+import { CategoryType, TransactionType, Frequency } from "../constants/enums";
 
 export const defaultCategories = [
   // Income Categories
@@ -8,6 +9,10 @@ export const defaultCategories = [
     icon: "money",
     color: "#33FF57",
     type: CategoryType.INCOME,
+    transactionType: TransactionType.RECURRING,
+    frequency: Frequency.MONTHLY,
+    defaultAmount: 0,
+    isActive: true,
     isDefault: true,
   },
   {
@@ -16,6 +21,7 @@ export const defaultCategories = [
     icon: "work",
     color: "#33FF57",
     type: CategoryType.INCOME,
+    transactionType: TransactionType.ONE_TIME,
     isDefault: true,
   },
   {
@@ -24,6 +30,10 @@ export const defaultCategories = [
     icon: "trending_up",
     color: "#33FF57",
     type: CategoryType.INCOME,
+    transactionType: TransactionType.RECURRING,
+    frequency: Frequency.MONTHLY,
+    defaultAmount: 0,
+    isActive: true,
     isDefault: true,
   },
   {
@@ -32,6 +42,7 @@ export const defaultCategories = [
     icon: "card_giftcard",
     color: "#33FF57",
     type: CategoryType.INCOME,
+    transactionType: TransactionType.ONE_TIME,
     isDefault: true,
   },
 
@@ -42,6 +53,7 @@ export const defaultCategories = [
     icon: "restaurant",
     color: "#FF5733",
     type: CategoryType.EXPENSE,
+    transactionType: TransactionType.ONE_TIME,
     isDefault: true,
   },
   {
@@ -50,6 +62,7 @@ export const defaultCategories = [
     icon: "directions_car",
     color: "#FF5733",
     type: CategoryType.EXPENSE,
+    transactionType: TransactionType.ONE_TIME,
     isDefault: true,
   },
   {
@@ -58,6 +71,10 @@ export const defaultCategories = [
     icon: "home",
     color: "#FF5733",
     type: CategoryType.EXPENSE,
+    transactionType: TransactionType.RECURRING,
+    frequency: Frequency.MONTHLY,
+    defaultAmount: 0,
+    isActive: true,
     isDefault: true,
   },
   {
@@ -66,6 +83,10 @@ export const defaultCategories = [
     icon: "build",
     color: "#FF5733",
     type: CategoryType.EXPENSE,
+    transactionType: TransactionType.RECURRING,
+    frequency: Frequency.MONTHLY,
+    defaultAmount: 0,
+    isActive: true,
     isDefault: true,
   },
   {
@@ -74,6 +95,7 @@ export const defaultCategories = [
     icon: "shopping_cart",
     color: "#FF5733",
     type: CategoryType.EXPENSE,
+    transactionType: TransactionType.ONE_TIME,
     isDefault: true,
   },
   {
@@ -82,6 +104,7 @@ export const defaultCategories = [
     icon: "sports_esports",
     color: "#FF5733",
     type: CategoryType.EXPENSE,
+    transactionType: TransactionType.ONE_TIME,
     isDefault: true,
   },
   {
@@ -90,6 +113,7 @@ export const defaultCategories = [
     icon: "local_hospital",
     color: "#FF5733",
     type: CategoryType.EXPENSE,
+    transactionType: TransactionType.ONE_TIME,
     isDefault: true,
   },
   {
@@ -98,6 +122,10 @@ export const defaultCategories = [
     icon: "school",
     color: "#FF5733",
     type: CategoryType.EXPENSE,
+    transactionType: TransactionType.RECURRING,
+    frequency: Frequency.MONTHLY,
+    defaultAmount: 0,
+    isActive: true,
     isDefault: true,
   },
 ];

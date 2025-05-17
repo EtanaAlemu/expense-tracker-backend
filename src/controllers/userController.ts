@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { User, IUserDocument } from "../models/User";
+import { IUserDocument, User } from "../models/User";
 import { UpdateUserRequest } from "../dto/user.dto";
 import mongoose from "mongoose";
+import { Currency, Language, Role } from "../constants/enums";
 
 export const getUserProfile = async (
   req: Request,
@@ -40,23 +41,23 @@ export const updateUserProfile = async (
       return;
     }
 
-    const { firstName, lastName, email, image, currency, language } =
+    const { firstName, lastName, image, currency, language } =
       req.body as UpdateUserRequest;
 
-    // Validate email if provided
-    if (email && email !== user.email) {
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        res.status(400).json({ message: "Email already in use" });
-        return;
-      }
-    }
-
     // Validate language if provided
-    if (language && !["en", "am", "om"].includes(language)) {
+    if (language && !Object.values(Language).includes(language)) {
       res.status(400).json({
         message: "Invalid language",
-        supportedLanguages: ["en", "am", "om"],
+        supportedLanguages: Object.values(Language),
+      });
+      return;
+    }
+
+    // Validate currency if provided
+    if (currency && !Object.values(Currency).includes(currency)) {
+      res.status(400).json({
+        message: "Invalid currency",
+        supportedCurrencies: Object.values(Currency),
       });
       return;
     }
@@ -83,7 +84,6 @@ export const updateUserProfile = async (
     const updateFields: Partial<IUserDocument> = {};
     if (firstName) updateFields.firstName = firstName;
     if (lastName) updateFields.lastName = lastName;
-    if (email) updateFields.email = email;
     if (image) updateFields.image = image;
     if (currency) updateFields.currency = currency;
     if (language) updateFields.language = language;
@@ -209,19 +209,30 @@ export const deleteUser = async (
 };
 
 export const updateUserRole = async (
-  req: Request<{ id: string }, {}, { role: "user" | "admin" }>,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const user = await User.findById(req.params.id);
+    const { id } = req.params;
+    const { role } = req.body;
+
+    if (!Object.values(Role).includes(role as Role)) {
+      res.status(400).json({
+        message: "Invalid role",
+        supportedRoles: Object.values(Role),
+      });
+      return;
+    }
+
+    const user = await User.findById(id);
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
     }
 
-    const { role } = req.body;
+    user.role = role as Role;
+    await user.save();
 
-    user.role = role;
     const updatedUser = await user.save();
     res.status(200).json({
       message: `User role updated to ${role}`,

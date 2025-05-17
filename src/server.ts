@@ -4,7 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import connectDB from "./config/db";
-import { bootstrap } from "./bootstrap";
+// import { bootstrap } from "./bootstrap";
 import { requestLogger } from "./middleware/loggerMiddleware";
 
 // Import routes
@@ -45,8 +45,8 @@ const startServer = async () => {
     console.log("✅ MongoDB Connected Successfully");
 
     // Bootstrap the application after database connection
-    await bootstrap();
-    console.log("✅ Application bootstrap completed successfully");
+    // await bootstrap();
+    // console.log("✅ Application bootstrap completed successfully");
 
     // Start server
     const PORT: number = parseInt(process.env.PORT || "5000", 10);

@@ -2,8 +2,10 @@ import { ITransaction } from "../types";
 
 // Transaction Request DTOs
 export interface CreateTransactionRequest {
+  _id?: string;
   amount: number;
   type: "Income" | "Expense";
+  title: string;
   category: string;
   description: string;
   date: Date;
@@ -13,6 +15,7 @@ export interface UpdateTransactionRequest {
   id?: string;
   user?: string;
   amount?: number;
+  title?: string;
   description?: string;
   type?: string;
   category?: string;
@@ -25,6 +28,7 @@ export class TransactionResponse {
   id: string;
   amount: number;
   type: "Income" | "Expense";
+  title: string;
   category: string;
   description: string;
   date: Date;
@@ -36,6 +40,7 @@ export class TransactionResponse {
     this.id = transaction._id?.toString() || "";
     this.amount = transaction.amount;
     this.type = transaction.type;
+    this.title = transaction.title;
     this.category = transaction.category?.toString() || "";
     this.description = transaction.description || "";
     this.date = transaction.date;

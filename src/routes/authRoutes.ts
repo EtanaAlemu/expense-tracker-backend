@@ -5,6 +5,8 @@ import {
   forgotPassword,
   resetPassword,
   changePassword,
+  verifyEmail,
+  resendVerification,
 } from "../controllers/authController";
 import { protect } from "../middleware/authMiddleware";
 
@@ -12,16 +14,28 @@ const router = express.Router();
 
 /**
  * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Authentication endpoints
+ */
+
+/**
+ * @swagger
  * /api/auth/register:
  *   post:
  *     summary: Register a new user
- *     tags: [Authentication]
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - email
+ *               - password
  *             properties:
  *               firstName:
  *                 type: string
@@ -29,80 +43,99 @@ const router = express.Router();
  *                 type: string
  *               email:
  *                 type: string
- *                 format: email
  *               password:
  *                 type: string
- *                 format: password
- *             required:
- *               - firstName
- *               - lastName
- *               - email
- *               - password
  *     responses:
  *       201:
  *         description: User registered successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 token:
- *                   type: string
- *                 user:
- *                   $ref: '#/components/schemas/User'
  *       400:
  *         description: User already exists
- *       500:
- *         description: Server error
  */
 router.post("/register", registerUser);
 
 /**
  * @swagger
- * /api/auth/login:
+ * /api/auth/verify:
  *   post:
- *     summary: Login a user
- *     tags: [Authentication]
+ *     summary: Verify user email
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email
+ *               - code
  *             properties:
  *               email:
  *                 type: string
- *                 format: email
- *               password:
+ *               code:
  *                 type: string
- *                 format: password
+ *     responses:
+ *       200:
+ *         description: Email verified successfully
+ *       400:
+ *         description: Invalid or expired verification code
+ */
+router.post("/verify", verifyEmail);
+
+/**
+ * @swagger
+ * /api/auth/resend-verification:
+ *   post:
+ *     summary: Resend verification code
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Verification code resent successfully
+ *       400:
+ *         description: Email is already verified
+ *       404:
+ *         description: User not found
+ */
+router.post("/resend-verification", resendVerification);
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
  *             required:
  *               - email
  *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Login successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 token:
- *                   type: string
- *                 user:
- *                   $ref: '#/components/schemas/User'
  *       400:
- *         description: Invalid email or password
+ *         description: Invalid credentials
  *       403:
- *         description: Account is deactivated
- *       500:
- *         description: Server error
+ *         description: Account not verified or deactivated
  */
-
 router.post("/login", loginUser);
 
 /**
@@ -110,70 +143,59 @@ router.post("/login", loginUser);
  * /api/auth/forgot-password:
  *   post:
  *     summary: Request password reset
- *     tags: [Authentication]
- *     description: Sends an email with password reset links - one for mobile app (deep link) and one for web browser
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email
  *             properties:
  *               email:
  *                 type: string
- *                 format: email
- *             required:
- *               - email
  *     responses:
  *       200:
- *         description: Password reset links sent to email (includes both mobile deep link and web browser link)
+ *         description: Password reset link sent
  *       400:
- *         description: User with this email does not exist
- *       500:
- *         description: Server error or email sending failed
+ *         description: User not found
  */
-
 router.post("/forgot-password", forgotPassword);
 
 /**
  * @swagger
  * /api/auth/reset-password:
  *   post:
- *     summary: Reset password using token
- *     tags: [Authentication]
- *     description: Resets user password using token received via email (works for both mobile and web)
+ *     summary: Reset password
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - token
+ *               - password
  *             properties:
  *               token:
  *                 type: string
- *                 description: Token received in the password reset email via deep link or web link
- *               newPassword:
+ *               password:
  *                 type: string
- *                 format: password
- *             required:
- *               - token
- *               - newPassword
  *     responses:
  *       200:
  *         description: Password reset successful
  *       400:
  *         description: Invalid or expired token
- *       500:
- *         description: Server error
  */
-
 router.post("/reset-password", resetPassword);
 
 /**
  * @swagger
  * /api/auth/change-password:
  *   post:
- *     summary: Change user password
+ *     summary: Change password
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
@@ -189,10 +211,8 @@ router.post("/reset-password", resetPassword);
  *             properties:
  *               currentPassword:
  *                 type: string
- *                 description: Current password
  *               newPassword:
  *                 type: string
- *                 description: New password
  *     responses:
  *       200:
  *         description: Password changed successfully
@@ -200,10 +220,6 @@ router.post("/reset-password", resetPassword);
  *         description: Current password is incorrect
  *       401:
  *         description: Not authenticated
- *       404:
- *         description: User not found
- *       500:
- *         description: Server error
  */
 router.post("/change-password", protect, changePassword);
 

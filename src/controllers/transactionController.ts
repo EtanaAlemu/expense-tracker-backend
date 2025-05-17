@@ -12,22 +12,86 @@ export const addTransaction = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { type, amount, category, description, date } = req.body;
-    console.log();
-    const transaction = new Transaction({
-      user: req.user?.id,
-      type,
-      amount,
-      category,
-      description,
-      date,
-    });
+    const { _id, ...transactionData } = req.body;
 
-    await transaction.save();
-    res.status(201).json(transaction);
+    // Validate required fields
+    if (!transactionData.title) {
+      res.status(400).json({
+        success: false,
+        error: "Transaction title is required",
+      });
+      return;
+    }
+
+    // Check if _id is provided and valid
+    if (_id) {
+      // Validate MongoDB ObjectId format
+      if (!/^[0-9a-fA-F]{24}$/.test(_id)) {
+        console.log("Invalid ID format:", _id);
+        // Create new transaction with provided data
+        const transaction = new Transaction({
+          ...transactionData,
+          user: req.user?.id, // Use req.user.id for user field
+        });
+        await transaction.save();
+        res.status(201).json({
+          success: true,
+          data: transaction,
+        });
+        return;
+      }
+
+      try {
+        // Check if transaction exists with this ID
+        const existingTransaction = await Transaction.findById(_id);
+        if (existingTransaction) {
+          res.status(200).json({
+            success: true,
+            data: existingTransaction,
+            message: "Transaction already exists",
+          });
+          return;
+        }
+
+        // Create new transaction with custom ID
+        const transaction = new Transaction({
+          _id,
+          ...transactionData,
+          user: req.user?.id, // Use req.user.id for user field
+        });
+        await transaction.save();
+        res.status(201).json({
+          success: true,
+          data: transaction,
+        });
+      } catch (error) {
+        console.log("Error creating transaction with custom ID:", error);
+        // Create new transaction without custom ID
+        const transaction = new Transaction({
+          ...transactionData,
+          user: req.user?.id, // Use req.user.id for user field
+        });
+        await transaction.save();
+        res.status(201).json({
+          success: true,
+          data: transaction,
+        });
+      }
+    } else {
+      // Create new transaction without custom ID
+      const transaction = new Transaction({
+        ...transactionData,
+        user: req.user?.id, // Use req.user.id for user field
+      });
+      await transaction.save();
+      res.status(201).json({
+        success: true,
+        data: transaction,
+      });
+    }
   } catch (error) {
     res.status(500).json({
-      message: "Server error",
+      success: false,
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

@@ -1,20 +1,24 @@
+import { Currency, Language, Role } from "../constants/enums";
 import { IUser } from "../types";
 
 // User Request DTOs
 export interface CreateUserRequest {
-  email: string;
-  password: string;
   firstName: string;
   lastName: string;
+  email: string;
+  password: string;
+  currency?: Currency;
+  language?: Language;
 }
 
 export interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
   email?: string;
+  password?: string;
+  currency?: Currency;
+  language?: Language;
   image?: string;
-  currency?: string;
-  language?: "en" | "am" | "om";
 }
 
 export interface LoginRequest {
@@ -25,28 +29,30 @@ export interface LoginRequest {
 // User Response DTOs
 export class UserResponse {
   id: string;
-  email: string;
   firstName: string;
   lastName: string;
+  email: string;
+  image?: string;
+  currency: Currency;
+  language: Language;
+  role: Role;
+  isActive: boolean;
+  isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
 
   constructor(user: IUser) {
-    this.id = user._id;
-    this.email = user.email;
+    this.id = user._id?.toString() || "";
     this.firstName = user.firstName;
     this.lastName = user.lastName;
-    this.createdAt = user.createdAt;
-    this.updatedAt = user.updatedAt;
-  }
-}
-
-export class LoginResponse {
-  user: UserResponse;
-  token: string;
-
-  constructor(user: IUser, token: string) {
-    this.user = new UserResponse(user);
-    this.token = token;
+    this.email = user.email;
+    this.image = user.image;
+    this.currency = user.currency;
+    this.language = user.language;
+    this.role = user.role;
+    this.isActive = user.active;
+    this.isVerified = user.isVerified;
+    this.createdAt = user.createdAt || new Date();
+    this.updatedAt = user.updatedAt || new Date();
   }
 }
