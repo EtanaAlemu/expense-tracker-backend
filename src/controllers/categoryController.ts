@@ -90,7 +90,7 @@ export const createCategory = async (
       _id: customId, // Use custom ID if provided and valid
       ...categoryData,
       isDefault: isAdmin,
-      createdBy: isAdmin ? undefined : userId,
+      createdBy: userId,
       isRecurring: categoryData.transactionType === TransactionType.RECURRING,
     });
 

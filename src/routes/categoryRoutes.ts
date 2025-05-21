@@ -94,7 +94,7 @@ router.use(protect);
  *       500:
  *         description: Server error
  */
-router.post("/", createCategory);
+router.post("/", protect, createCategory);
 
 /**
  * @swagger
@@ -124,7 +124,7 @@ router.post("/", createCategory);
  *       500:
  *         description: Server error
  */
-router.get("/", getCategories);
+router.get("/", protect, getCategories);
 
 /**
  * @swagger
@@ -161,7 +161,7 @@ router.get("/", getCategories);
  *       401:
  *         description: Not authenticated
  */
-router.get("/recurring", getRecurringCategories);
+router.get("/recurring", protect, getRecurringCategories);
 
 /**
  * @swagger
@@ -189,7 +189,7 @@ router.get("/recurring", getRecurringCategories);
  *       404:
  *         description: Category not found
  */
-router.get("/:id", getCategory);
+router.get("/:id", protect, getCategory);
 
 /**
  * @swagger
@@ -251,7 +251,7 @@ router.get("/:id", getCategory);
  *       500:
  *         description: Server error
  */
-router.put("/:id", updateCategory);
+router.put("/:id", protect, updateCategory);
 
 /**
  * @swagger
@@ -288,7 +288,7 @@ router.put("/:id", updateCategory);
  *       500:
  *         description: Server error
  */
-router.delete("/:id", deleteCategory);
+router.delete("/:id", protect, deleteCategory);
 
 /**
  * @swagger

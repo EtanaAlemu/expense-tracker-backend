@@ -36,12 +36,10 @@ export const addBudget = async (
     );
     res.status(201).json(populatedBudget);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Server error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
@@ -57,12 +55,10 @@ export const getBudgets = async (
     );
     res.status(200).json(budgets);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Server error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
@@ -99,12 +95,10 @@ export const updateBudget = async (
     );
     res.status(200).json(populatedBudget);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Server error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
@@ -129,12 +123,10 @@ export const deleteBudget = async (
     await budget.deleteOne();
     res.status(200).json({ message: "Budget deleted successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Server error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
@@ -224,12 +216,10 @@ export const getAllBudgets = async (
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Server error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
@@ -248,11 +238,9 @@ export const deleteAnyBudget = async (
     await budget.deleteOne();
     res.status(200).json({ message: "Budget deleted successfully by admin" });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Server error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
