@@ -6,7 +6,6 @@ import {
   RecurringCategoryQuery,
 } from "../dto/category.dto";
 import { CategoryType, TransactionType, Frequency } from "../constants/enums";
-import mongoose from "mongoose";
 
 // Create a new category
 export const createCategory = async (
@@ -17,34 +16,6 @@ export const createCategory = async (
     const { _id, ...categoryData } = req.body;
     const userId = req.user?.id;
     const isAdmin = req.user?.role === "admin";
-
-    // Check if _id is provided and is a valid MongoDB ObjectId format
-    let customId: mongoose.Types.ObjectId | undefined;
-    if (_id) {
-      // Check if the ID matches MongoDB ObjectId format (24 hex characters)
-      if (/^[0-9a-fA-F]{24}$/.test(_id)) {
-        try {
-          customId = new mongoose.Types.ObjectId(_id);
-          // Check if category with this ID already exists
-          const existingCategory = await Category.findById(customId);
-          if (existingCategory) {
-            // Return existing category instead of error
-            res.status(200).json({
-              success: true,
-              data: existingCategory,
-              message: "Category already exists",
-            });
-            return;
-          }
-        } catch (error) {
-          // If ObjectId creation fails, continue with new category creation
-          console.log("Invalid ObjectId format, creating new category");
-        }
-      } else {
-        // If ID format is invalid, continue with new category creation
-        console.log("Invalid ID format, creating new category");
-      }
-    }
 
     // Basic validation
     if (!categoryData.name) {
@@ -86,20 +57,83 @@ export const createCategory = async (
       }
     }
 
-    const category = new Category({
-      _id: customId, // Use custom ID if provided and valid
-      ...categoryData,
-      isDefault: isAdmin,
-      createdBy: userId,
-      isRecurring: categoryData.transactionType === TransactionType.RECURRING,
-    });
+    // Check if _id is provided and valid
+    if (_id) {
+      // Validate MongoDB ObjectId format
+      if (!/^[0-9a-fA-F]{24}$/.test(_id)) {
+        console.log("Invalid ID format:", _id);
+        // Create new category with provided data
+        const category = new Category({
+          ...categoryData,
+          isDefault: isAdmin,
+          createdBy: userId,
+          isRecurring:
+            categoryData.transactionType === TransactionType.RECURRING,
+        });
+        await category.save();
+        res.status(201).json({
+          success: true,
+          data: category,
+        });
+        return;
+      }
 
-    await category.save();
+      try {
+        // Check if category exists with this ID
+        const existingCategory = await Category.findById(_id);
+        if (existingCategory) {
+          res.status(200).json({
+            success: true,
+            data: existingCategory,
+            message: "Category already exists",
+          });
+          return;
+        }
 
-    res.status(201).json({
-      success: true,
-      data: category,
-    });
+        // Create new category with custom ID
+        const category = new Category({
+          _id,
+          ...categoryData,
+          isDefault: isAdmin,
+          createdBy: userId,
+          isRecurring:
+            categoryData.transactionType === TransactionType.RECURRING,
+        });
+        await category.save();
+        res.status(201).json({
+          success: true,
+          data: category,
+        });
+      } catch (error) {
+        console.log("Error creating category with custom ID:", error);
+        // Create new category without custom ID
+        const category = new Category({
+          ...categoryData,
+          isDefault: isAdmin,
+          createdBy: userId,
+          isRecurring:
+            categoryData.transactionType === TransactionType.RECURRING,
+        });
+        await category.save();
+        res.status(201).json({
+          success: true,
+          data: category,
+        });
+      }
+    } else {
+      // Create new category without custom ID
+      const category = new Category({
+        ...categoryData,
+        isDefault: isAdmin,
+        createdBy: userId,
+        isRecurring: categoryData.transactionType === TransactionType.RECURRING,
+      });
+      await category.save();
+      res.status(201).json({
+        success: true,
+        data: category,
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -114,8 +148,10 @@ export const getCategories = async (
   res: Response
 ): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
+    console.log("userId", userId);
     const isAdmin = req.user?.role === "admin";
+    console.log("isAdmin", isAdmin);
     const { showDefault, type } = req.query;
 
     let query: any = {};

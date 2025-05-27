@@ -78,7 +78,7 @@ const sendVerificationEmail = async (
   `;
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: `"Expense Tracker" <${process.env.EMAIL_USER}>`,
     to: user.email,
     subject: "Verify Your Email - Expense Tracker",
     html: htmlEmail,
@@ -385,7 +385,7 @@ export const forgotPassword = async (
     `;
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"Expense Tracker" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Password Reset Request - Expense Tracker",
       html: htmlEmail,
